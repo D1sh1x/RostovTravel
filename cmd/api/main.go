@@ -25,7 +25,7 @@ func main() {
 
 	repo, err := mongodb.NewStorage(
 		config.DBConnectionString,
-		"rostov_travel",
+		"users",
 		"users",
 	)
 

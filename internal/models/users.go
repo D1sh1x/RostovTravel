@@ -13,6 +13,7 @@ type User struct {
 	CreatedAt    time.Time          `bson:"created_at" json:"created_at"`
 	Favorites    []Favorite         `bson:"favorites" json:"favorites"`
 	Role         string             `bson:"role" json:"role"`
+	Username     string             `bson:"username" json:"username"`
 }
 
 type Favorite struct {

@@ -21,6 +21,18 @@ func (r *UserMongoRepo) CreateUser(ctx context.Context, user *models.User) error
 
 	res, err := r.coll.InsertOne(ctx, user)
 	if err != nil {
+		if we, ok := err.(mongo.WriteException); ok {
+			for _, e := range we.WriteErrors {
+				if e.Code == 11000 {
+					return fmt.Errorf("duplicate username")
+				}
+			}
+		}
+		if ce, ok := err.(mongo.CommandError); ok {
+			if ce.Code == 11000 {
+				return fmt.Errorf("duplicate username")
+			}
+		}
 		return fmt.Errorf("failed to insert user: %w", err)
 	}
 
@@ -55,9 +67,9 @@ func (r *UserMongoRepo) GetUserByID(ctx context.Context, id primitive.ObjectID) 
 	return &user, nil
 }
 
-func (r *UserMongoRepo) GetUserByName(ctx context.Context, name string) (*models.User, error) {
+func (r *UserMongoRepo) GetUserByName(ctx context.Context, username string) (*models.User, error) {
 	var user models.User
-	err := r.coll.FindOne(ctx, bson.M{"name": name}).Decode(&user)
+	err := r.coll.FindOne(ctx, bson.M{"username": username}).Decode(&user)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, mongo.ErrNoDocuments

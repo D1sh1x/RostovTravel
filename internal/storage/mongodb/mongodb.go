@@ -7,6 +7,7 @@ import (
 
 	"hackaton/internal/repository"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -38,6 +39,18 @@ func NewStorage(connectionString, databaseName, collectionName string) (reposito
 	db := client.Database(databaseName)
 	usersColl := db.Collection(collectionName)
 
+	idxModel := mongo.IndexModel{
+		Keys:    bson.D{{Key: "username", Value: 1}},
+		Options: options.Index().SetUnique(true).SetBackground(true),
+	}
+
+	ctxIdx, cancelIdx := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancelIdx()
+
+	if _, err := usersColl.Indexes().CreateOne(ctxIdx, idxModel); err != nil {
+		return nil, fmt.Errorf("failed to create username index: %w", err)
+	}
+
 	storage := &Storage{
 		client:   client,
 		db:       db,
@@ -47,12 +60,10 @@ func NewStorage(connectionString, databaseName, collectionName string) (reposito
 	return storage, nil
 }
 
-// важно чтобы можно было корректно завершать соединение
 func (s *Storage) Close(ctx context.Context) error {
 	return s.client.Disconnect(ctx)
 }
 
-// Реализация RepositoryInterface
 func (s *Storage) User() repository.UserRepositoryInterface {
 	return s.userRepo
 }

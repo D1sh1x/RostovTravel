@@ -32,10 +32,10 @@ func newUserService(repo repository.RepositoryInterface, jwtSecret []byte, logge
 }
 
 func (s *userService) Login(ctx context.Context, req *request.LoginRequest) (*response.LoginResponse, error) {
-	log := s.logger.With().Str("name", req.Name).Logger()
+	log := s.logger.With().Str("name", req.Username).Logger()
 	log.Info().Msg("login attempt")
 
-	user, err := s.repo.User().GetUserByName(ctx, req.Name)
+	user, err := s.repo.User().GetUserByName(ctx, req.Username)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get user by name")
 		return nil, errors.New("invalid credentials")
