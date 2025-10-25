@@ -95,6 +95,7 @@ func (s *userService) CreateUser(ctx context.Context, req *request.UserRequest) 
 
 	u := &models.User{
 		Name:         req.Name,
+		Username:     req.Username,
 		PasswordHash: string(passwordHashBytes),
 		Favorites:    favoritesModel,
 		Role:         req.Role,
