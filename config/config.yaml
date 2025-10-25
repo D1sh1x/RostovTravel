@@ -1,0 +1,8 @@
+env: dev #local, dev, prod
+jwt_secret: andrey
+http_server:
+  port: :8080
+  write_timeout: 5s
+  read_timeout: 5s
+  idle_timeout: 60s
+db_connection_string: mongodb+srv://heimseweb:nudeta62@rostov-travel.vuyh6fk.mongodb.net/?appName=rostov-travel
